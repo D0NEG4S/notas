@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: notas
+    port: 8081
+
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/notas?useSSL=false
+    username: root
+    password: taskit123
+  jpa:
+    hibernate.ddl-auto: update
+    generate-ddl: true
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+
+server:
+  port: 8081
+
