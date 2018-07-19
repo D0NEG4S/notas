@@ -42,23 +42,36 @@ public class NotaController {
         if(service.updateNota(id, nota)){
             return new ResponseEntity<String>(HttpStatus.OK);
         } else {
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @DeleteMapping(value="/{id}")
-    public ResponseEntity<String> update(@PathVariable Long id) {
+    public ResponseEntity<String> delete(@PathVariable Long id) {
         LOG.info("Deletando nota com id = {}", id);
 
         if(service.deleteNota(id)){
             return new ResponseEntity<String>("Sua nota foi excluída com sucesso " + id, HttpStatus.OK);
         } else {
-            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping(value="/{id}")
+    public ResponseEntity<Nota> getOne(@PathVariable Long id) {
+        LOG.info("Listando nota com id = {}", id);
+
+        try{
+            Nota nota = service.getOne(id);
+
+            return new ResponseEntity<Nota>(nota, HttpStatus.OK);
+        } catch(Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping
-    public ResponseEntity<List<Nota>> getOne() {
+    public ResponseEntity<List<Nota>> getAll() {
         LOG.info("Listando todas as notas");
 
         List<Nota> notas = service.getAll();
