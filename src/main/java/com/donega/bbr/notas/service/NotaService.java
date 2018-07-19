@@ -5,6 +5,8 @@ import com.donega.bbr.notas.repository.NotaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -55,6 +57,15 @@ public class NotaService implements INotaService {
 
     @Override
     public List<Nota> getAll() {
-        return repository.findAll();
+        List<Nota> notas = repository.findAll();
+
+        Collections.sort(notas, new Comparator<Nota>() {
+            @Override
+            public int compare(Nota o1, Nota o2) {
+                return o1.getId().compareTo(o2.getId());
+            }
+        });
+
+        return notas;
     }
 }

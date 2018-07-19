@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Notas</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js" integrity="sha256-xNjb53/rY+WmG+4L6tTl9m6PpqknWZvRt0rO1SRnJzw=" crossorigin="anonymous"></script>
+    <script type="text/javascript"
+            src="http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.min.js">
+    </script>
+    <script type="text/javascript"
+            src="http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.pt-BR.js">
+    </script>
+    <style>
+    /* Remove the navbar's default margin-bottom and rounded borders */
+    .navbar {
+      margin-bottom: 0;
+      border-radius: 0;
+    }
+
+    /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+    .row.content {height: 450px}
+
+    /* Set gray background color and 100% height */
+    .sidenav {
+      padding-top: 20px;
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: #555;
+      color: white;
+      padding: 15px;
+    }
+
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    @media screen and (max-width: 767px) {
+      .sidenav {
+        height: auto;
+        padding: 15px;
+      }
+      .row.content {height:auto;}
+    }
+
+
+
+    </style>
+    <script>
+        $(document).ready(function(){
+            $.get("http://localhost:8081/notas", function(data, status){
+               data.forEach(function(nota){
+                    var trHTML = '<tr><td>' + nota.id + '</td><td>' + nota.data + '</td><td>' + nota.valor + '</td><td>' + nota.description + '</td><td><a id="myLink" href="#" onclick="deletaNota(' + nota.id + ');">Deletar</a></td></tr>';
+                    $('#table-notas > tbody:last-child').append(trHTML);
+                })
+            });
+        });
+
+        function reloadTable(){
+            $("#table-notas tr").remove();
+            $.get("http://localhost:8081/notas", function(data, status){
+               data.forEach(function(nota){
+                    var trHTML = '<tr><td>' + nota.id + '</td><td>' + nota.data + '</td><td>' + nota.valor + '</td><td>' + nota.description + '</td><td><a id="myLink" href="#" onclick="deletaNota(' + nota.id + ');">Deletar</a></td></tr>';
+                    $('#table-notas > tbody:last-child').append(trHTML);
+                })
+            });
+        }
+
+        function enviaNota(){
+            var url = "http://localhost:8081/notas";
+
+            var data = {};
+            data.id = document.getElementById("id-nota").value;
+            data.data  = document.getElementById("data").value;
+            data.valor = document.getElementById("valor").value.replace(",",".");
+            data.description = document.getElementById("desc").value;
+            var json = JSON.stringify(data);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
+            xhr.onload = function () {
+                var response = JSON.parse(xhr.responseText);
+                if (xhr.readyState == 4 && xhr.status == "201") {
+		            console.table(response);
+                } else {
+		            console.error(response);
+                }
+            }
+            xhr.send(json);
+            location.reload();
+        }
+
+        function deletaNota(id){
+            // Delete a user
+            var url = "http://localhost:8081/notas";
+            var xhr = new XMLHttpRequest();
+            xhr.open("DELETE", url+'/'+id, true);
+            xhr.onload = function () {
+                var users = JSON.parse(xhr.responseText);
+                if (xhr.readyState == 4 && xhr.status == "200") {
+                    console.table(users);
+                } else {
+                    console.error(users);
+                }
+            }
+            xhr.send(null);
+            location.reload();
+        }
+    </script>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <br>
+            <div class="container">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#nota-motal">
+                    Nova nota
+                </button>
+            </div>
+            <br>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid text-center">
+    <div class="row content">
+        <div class="col-sm-8 text-left">
+            <div class="container">
+                <h2>Notas</h2>
+                <table class="table table-striped" id="table-notas">
+                    <tbody>
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Data</th>
+                                <th>Valor</th>
+                                <th>Descrição</th>
+                                <th>Deletar</th>
+                            </tr>
+                        </thead>
+                    <tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="nota-motal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Cria nota</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/action_page.php">
+                    <div class="form-group">
+                        <label>Código nota:</label>
+                        <input type="text" class="form-control" id="id-nota">
+                    </div>
+                    <div class="form-group">
+                        <label>Data:</label>
+                        <input type="text" class="form-control" id="data">
+                    </div>
+                    <div class="form-group">
+                        <label>Valor:</label>
+                        <input type="text" class="form-control" id="valor">
+                    </div>
+                    <div class="form-group">
+                        <label>Descrição:</label>
+                        <input type="text" class="form-control" id="desc">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fecha</button>
+                <button type="button" class="btn btn-primary" onclick="enviaNota()">Salva</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
